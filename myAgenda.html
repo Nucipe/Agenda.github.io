@@ -1,0 +1,2334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+
+<title>Agenda Digital</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --bg: #f6f3fb;
+  --paper: #fffdfd;
+  --paper-2: #faf8ff;
+  --primary: #9a82d8;
+  --primary-soft: #e9e1ff;
+  --primary-dark: #6953a5;
+  --text: #403b4b;
+  --muted: #918a9d;
+  --line: #e9e3ef;
+  --accent: #f3dce8;
+  --success: #b9dec8;
+  --shadow: 0 8px 30px rgba(79, 65, 103, .08);
+  --radius: 18px;
+  --header-h: 64px;
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  font-family: "Nunito", sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+}
+
+button {
+  border: 0;
+}
+
+.app {
+  height: 100dvh;
+  width: 100%;
+  display: flex;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.topbar {
+  height: var(--header-h);
+  flex: 0 0 var(--header-h);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 14px;
+  background: rgba(255,255,255,.78);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--line);
+  position: relative;
+  z-index: 20;
+}
+
+.menu-btn,
+.icon-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+}
+
+.menu-lines {
+  width: 19px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.menu-lines span {
+  height: 2px;
+  border-radius: 3px;
+  background: currentColor;
+  width: 100%;
+}
+
+.app-title {
+  font-size: 20px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.header-spacer {
+  flex: 1;
+}
+
+.date-picker {
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: white;
+  color: var(--text);
+  padding: 0 10px;
+  outline: none;
+  cursor: pointer;
+}
+
+.sync-status {
+  font-size: 12px;
+  color: var(--muted);
+  min-width: 75px;
+  text-align: right;
+}
+
+/* =========================================================
+   VISTAS — CENTRADAS Y TRANSLÚCIDAS
+========================================================= */
+
+.view-tabs {
+  position: relative;
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 90px 7px 14px;
+  background: rgba(255, 255, 255, .42);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(255,255,255,.5);
+  flex: 0 0 auto;
+}
+
+.view-tab {
+  padding: 8px 18px;
+  border-radius: 12px;
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background .18s ease, color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.view-tab:hover {
+  background: rgba(255,255,255,.5);
+}
+
+.view-tab.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 14px rgba(0,0,0,.08);
+}
+
+.view-tab:active {
+  transform: scale(.97);
+}
+
+.today-btn {
+  position: absolute;
+  right: 14px;
+  padding: 8px 15px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.45);
+  color: var(--primary-dark);
+  border: 1px solid rgba(255,255,255,.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  font-weight: 800;
+  transition: background .18s ease, color .18s ease, transform .18s ease;
+}
+
+.today-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.today-btn:active {
+  transform: scale(.96);
+}
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.tool-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+}
+
+.mode-btn {
+  padding: 8px 14px;
+  border-radius: 11px;
+  background: #f3f0f7;
+  color: var(--muted);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.mode-btn.active {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+}
+
+.tool-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: 6px;
+}
+
+.color-picker-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.color-input {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  background: none;
+}
+
+.color-input::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-input::-webkit-color-swatch {
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px var(--line);
+}
+
+.stroke-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.stroke-slider {
+  width: 80px;
+  accent-color: var(--primary);
+  cursor: pointer;
+}
+
+.palette {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.color-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 3px solid white;
+  box-shadow: 0 0 0 1px var(--line);
+  cursor: pointer;
+}
+
+.color-dot.active {
+  box-shadow: 0 0 0 2px var(--primary), 0 0 0 4px white;
+}
+
+.palette-manage {
+  height: 28px;
+  min-width: 28px;
+  padding: 0 8px;
+  border-radius: 9px;
+  background: #f1edf6;
+  color: var(--primary-dark);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+/* =========================================================
+   APP & LAYOUTS
+========================================================= */
+
+.shell {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.view {
+  height: 100%;
+  width: 100%;
+  display: none;
+  overflow: hidden;
+}
+
+.view.active {
+  display: flex;
+}
+
+.daily-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 31%);
+  width: 100%;
+  height: 100%;
+  gap: 12px;
+  padding: 12px;
+}
+
+.notes-card,
+.todo-card {
+  min-width: 0;
+  min-height: 0;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.notes-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  flex: 0 0 auto;
+  padding: 12px 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.card-title {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.card-subtitle {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.week-strip {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.day-chip {
+  min-width: 48px;
+  padding: 6px 7px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  background: #f6f3f8;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.day-chip strong {
+  display: block;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.day-chip.active {
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+}
+
+.notes-workspace {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 31px,
+      var(--line) 32px,
+      transparent 33px
+    ),
+    var(--paper);
+}
+
+.notes-editor {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 11px 20px 20px 24px;
+  outline: none;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 32px;
+  font-size: 16px;
+  z-index: 1;
+  caret-color: var(--primary-dark);
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+.notes-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  touch-action: none;
+}
+
+.notes-workspace.text-mode .notes-canvas {
+  pointer-events: none;
+}
+
+.notes-workspace.eraser-mode .notes-editor,
+.notes-workspace.pen-mode .notes-editor {
+  pointer-events: none;
+}
+
+.notes-workspace.eraser-mode .notes-canvas,
+.notes-workspace.pen-mode .notes-canvas {
+  cursor: crosshair;
+}
+
+/* =========================================================
+   TODO
+========================================================= */
+
+.todo-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.todo-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 10px 12px;
+}
+
+.todo-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 5px;
+  border-bottom: 1px solid var(--line);
+}
+
+.todo-check {
+  width: 19px;
+  height: 19px;
+  accent-color: var(--primary);
+  flex: 0 0 auto;
+}
+
+.todo-text {
+  flex: 1;
+  min-width: 0;
+  outline: none;
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.todo-item.done .todo-text {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.delete-task {
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  font-size: 17px;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+}
+
+.delete-task:hover {
+  background: #f6eef2;
+  color: #9a5c73;
+}
+
+.add-task-row {
+  padding: 10px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 7px;
+}
+
+.add-task-input {
+  flex: 1;
+  min-width: 0;
+  height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  padding: 0 12px;
+  outline: none;
+  background: var(--paper-2);
+}
+
+.add-task-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  font-weight: 800;
+}
+
+/* =========================================================
+   SEMANA Y MES
+========================================================= */
+
+.week-view, .month-view {
+  padding: 12px;
+  overflow: auto;
+}
+
+.week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(150px, 1fr));
+  gap: 10px;
+  min-width: 980px;
+  height: 100%;
+}
+
+.week-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  box-shadow: var(--shadow);
+}
+
+.week-card-header {
+  padding: 10px;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper-2);
+  cursor: pointer;
+}
+
+.week-card-header strong {
+  display: block;
+  font-size: 16px;
+}
+
+.week-card-header span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.mini-note {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 10px;
+  line-height: 1.4;
+  font-size: 13px;
+  outline: none;
+  cursor: text;
+}
+
+.mini-canvas-wrap {
+  height: 125px;
+  flex: 0 0 125px;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 20px,
+      var(--line) 21px,
+      transparent 22px
+    ),
+    var(--paper);
+  border-top: 1px solid var(--line);
+}
+
+.mini-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(100px, 1fr));
+  grid-auto-rows: minmax(105px, 1fr);
+  gap: 7px;
+  min-width: 720px;
+  height: 100%;
+}
+
+.month-heading {
+  background: transparent;
+  color: var(--muted);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 800;
+  padding: 5px;
+}
+
+.month-cell {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.month-cell.empty {
+  background: rgba(255,255,255,.35);
+  border-style: dashed;
+}
+
+.month-cell.today {
+  box-shadow: inset 0 0 0 2px var(--primary-soft);
+}
+
+.month-date {
+  flex: 0 0 auto;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--primary-dark);
+}
+
+.month-note {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 8px;
+  font-size: 11px;
+  line-height: 1.35;
+  outline: none;
+}
+
+.month-canvas {
+  width: 100%;
+  height: 45px;
+  flex: 0 0 45px;
+  display: block;
+  border-top: 1px solid var(--line);
+}
+
+/* =========================================================
+   SIDEBAR & MODALS
+========================================================= */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(47,38,58,.25);
+  z-index: 50;
+  display: none;
+}
+
+.overlay.open {
+  display: block;
+}
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(390px, 90vw);
+  background: var(--paper);
+  z-index: 51;
+  transform: translateX(-105%);
+  transition: transform .25s ease;
+  box-shadow: 12px 0 40px rgba(40,30,55,.13);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar-header {
+  height: 64px;
+  flex: 0 0 64px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.sidebar-title {
+  font-weight: 800;
+  font-size: 19px;
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+}
+
+.section {
+  margin-bottom: 25px;
+}
+
+.section-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--primary-dark);
+  margin-bottom: 9px;
+}
+
+.general-task {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.general-task .task-name {
+  flex: 1;
+}
+
+.general-task.done .task-name {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.theme-list {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.theme-option {
+  padding: 11px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  cursor: pointer;
+  background: white;
+  text-align: left;
+}
+
+.theme-option.active {
+  border: 2px solid var(--primary);
+}
+
+.theme-swatch {
+  width: 100%;
+  height: 20px;
+  border-radius: 7px;
+  margin-bottom: 6px;
+}
+
+.theme-option span {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.custom-theme-row {
+  display: grid;
+  grid-template-columns: 48px 1fr auto;
+  gap: 7px;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.custom-theme-row input[type=color] {
+  width: 48px;
+  height: 38px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.custom-theme-row input[type=text] {
+  height: 38px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0 99px;
+  outline: none;
+}
+
+.small-btn {
+  height: 38px;
+  padding: 0 11px;
+  border-radius: 10px;
+  background: var(--primary-soft);
+  color: var(--primary-dark);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.google-box {
+  padding: 12px;
+  background: var(--paper-2);
+  border-radius: 14px;
+  border: 1px solid var(--line);
+}
+
+.google-box p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.google-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.google-btn {
+  height: 40px;
+  border-radius: 11px;
+  background: white;
+  border: 1px solid var(--line);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.google-btn.primary {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(40,30,50,.3);
+  z-index: 70;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.modal-backdrop.open {
+  display: flex;
+}
+
+.modal {
+  width: min(430px, 100%);
+  max-height: 90dvh;
+  overflow: auto;
+  background: var(--paper);
+  border-radius: 20px;
+  box-shadow: 0 25px 70px rgba(30,20,45,.2);
+  padding: 18px;
+}
+
+.modal h3 {
+  margin: 0 0 5px;
+}
+
+.modal p {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.palette-manager-list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.palette-manager-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+}
+
+.palette-manager-item input[type=color] {
+  width: 35px;
+  height: 35px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.palette-manager-item span {
+  flex: 1;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.delete-color {
+  background: transparent;
+  color: #9a6c7f;
+  cursor: pointer;
+}
+
+.add-color-form {
+  display: grid;
+  grid-template-columns: 50px 1fr auto;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.add-color-form input[type=color] {
+  width: 50px;
+  height: 40px;
+  border: 0;
+  padding: 0;
+}
+
+.add-color-form input[type=text] {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0 10px;
+  outline: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 850px) {
+  .daily-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(220px, 36%);
+  }
+  .app-title {
+    font-size: 17px;
+  }
+  .sync-status {
+    display: none;
+  }
+}
+
+@media (max-width: 650px) {
+  :root {
+    --header-h: 57px;
+  }
+  .topbar {
+    padding: 7px 9px;
+    gap: 7px;
+  }
+  .menu-btn, .icon-btn {
+    width: 39px;
+    height: 39px;
+  }
+  .app-title {
+    display: none;
+  }
+  .date-picker {
+    min-width: 0;
+    flex: 1;
+  }
+  .view-tabs {
+    height: 51px;
+    padding: 6px 70px 6px 6px;
+    gap: 4px;
+  }
+  .view-tab {
+    padding: 8px 11px;
+    font-size: 12px;
+  }
+  .today-btn {
+    right: 7px;
+    padding: 8px 11px;
+    font-size: 12px;
+  }
+  .daily-layout {
+    display: flex;
+    flex-direction: column;
+    padding: 7px;
+    gap: 7px;
+  }
+  .notes-card {
+    flex: 1 1 60%;
+    min-height: 0;
+  }
+  .todo-card {
+    flex: 0 0 37%;
+    min-height: 190px;
+  }
+  .card-header {
+    padding: 8px 10px;
+  }
+  .week-strip {
+    overflow-x: auto;
+    max-width: 60%;
+  }
+  .day-chip {
+    min-width: 42px;
+  }
+  .tool-row {
+    padding: 7px 9px;
+    overflow-x: auto;
+  }
+  .palette {
+    flex-shrink: 0;
+  }
+  .notes-editor {
+    padding-left: 17px;
+    padding-right: 14px;
+    font-size: 15px;
+  }
+}
+
+@media (max-height: 600px) {
+  .todo-card {
+    flex-basis: 35%;
+  }
+  .mini-canvas-wrap {
+    height: 90px;
+    flex-basis: 90px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+  <div class="shell">
+
+    <!-- CABECERA -->
+    <header class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Abrir menú">
+        <span class="menu-lines">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
+      <div class="app-title">Agenda</div>
+      <input type="date" id="datePicker" class="date-picker">
+      <div class="header-spacer"></div>
+      <div class="sync-status" id="syncStatus">Local</div>
+    </header>
+
+    <!-- NAVEGACIÓN -->
+    <nav class="view-tabs">
+      <button class="view-tab active" data-view="daily">Día</button>
+      <button class="view-tab" data-view="weekly">Semana</button>
+      <button class="view-tab" data-view="monthly">Mes</button>
+      <button class="today-btn" id="todayBtn">Hoy</button>
+    </nav>
+
+    <!-- HERRAMIENTAS -->
+    <div class="tool-row">
+      <button class="mode-btn active" data-mode="text">Texto</button>
+      <button class="mode-btn" data-mode="pen">Lápiz</button>
+      <button class="mode-btn" data-mode="eraser">Goma</button>
+
+      <div class="tool-controls">
+        <!-- Control de Color de Texto seleccionado -->
+        <div class="color-picker-wrapper" title="Color del texto seleccionado">
+          <span>Texto:</span>
+          <input type="color" id="textColorPicker" class="color-input" value="#8d79c7">
+        </div>
+
+        <!-- Control de Color de Fondo / Resaltador -->
+        <div class="color-picker-wrapper" title="Color de fondo / resaltador de texto">
+          <span>Fondo:</span>
+          <input type="color" id="textBgPicker" class="color-input" value="#ffffff">
+        </div>
+
+        <!-- Control de Grosor del Lápiz -->
+        <div class="stroke-control" id="strokeControl" style="display: none;">
+          <span>Grosor:</span>
+          <input type="range" id="penWidthSlider" class="stroke-slider" min="1" max="25" value="3">
+          <span id="penWidthVal">3px</span>
+        </div>
+      </div>
+
+      <div class="palette" id="palette"></div>
+      <button class="palette-manage" id="managePalette" title="Editar paleta">+</button>
+    </div>
+
+    <!-- CONTENIDO -->
+    <main class="content">
+
+      <!-- DÍA -->
+      <section class="view active" id="dailyView">
+        <div class="daily-layout">
+          <section class="notes-card">
+            <div class="card-header">
+              <div>
+                <div class="card-title" id="dailyTitle">Notas</div>
+                <div class="card-subtitle">Texto y escritura a mano</div>
+              </div>
+              <div class="week-strip" id="weekStrip"></div>
+            </div>
+
+            <div class="notes-workspace text-mode" id="notesWorkspace">
+              <div
+                id="notesEditor"
+                class="notes-editor"
+                contenteditable="true"
+                spellcheck="true"
+                autocapitalize="sentences"
+                aria-label="Notas del día"
+              ></div>
+              <canvas id="notesCanvas" class="notes-canvas"></canvas>
+            </div>
+          </section>
+
+          <!-- TAREAS -->
+          <section class="todo-card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Tareas del día</div>
+                <div class="card-subtitle" id="todoDateLabel"></div>
+              </div>
+            </div>
+
+            <div class="todo-list" id="todoList"></div>
+
+            <div class="add-task-row">
+              <input id="taskInput" class="add-task-input" type="text" placeholder="Añadir tarea..." autocomplete="off">
+              <button id="addTaskBtn" class="add-task-btn">+</button>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <!-- SEMANA -->
+      <section class="view" id="weeklyView">
+        <div class="week-view">
+          <div class="week-grid" id="weekGrid"></div>
+        </div>
+      </section>
+
+      <!-- MES -->
+      <section class="view" id="monthlyView">
+        <div class="month-view">
+          <div class="month-grid" id="monthGrid"></div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div class="overlay" id="sidebarOverlay"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-title">Menú</div>
+    <div class="header-spacer"></div>
+    <button class="icon-btn" id="closeSidebar">×</button>
+  </div>
+
+  <div class="sidebar-content">
+    <section class="section">
+      <div class="section-title">Cosas por hacer sin fecha</div>
+      <div id="generalTasks"></div>
+      <div class="add-task-row" style="padding-left:0; padding-right:0; border:0">
+        <input id="generalTaskInput" class="add-task-input" type="text" placeholder="Nueva tarea...">
+        <button id="addGeneralTaskBtn" class="add-task-btn">+</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">Temas</div>
+      <div class="theme-list" id="themeList"></div>
+      <div class="custom-theme-row">
+        <input id="customThemeColor" type="color" value="#b9a6df">
+        <input id="customThemeName" type="text" placeholder="Nombre del tema">
+        <button class="small-btn" id="addThemeBtn">Añadir</button>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">Sincronización</div>
+      <div class="google-box">
+        <p>Tu agenda se sincroniza automáticamente con tu hoja de cálculo de Google Sheets.</p>
+        <div class="google-actions">
+          <button class="google-btn primary" id="googleSync">Sincronizar ahora</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</aside>
+
+<!-- MODAL PALETA -->
+<div class="modal-backdrop" id="paletteModal">
+  <div class="modal">
+    <h3>Paleta de colores</h3>
+    <p>Estos colores sirven tanto para el texto como para el lápiz.</p>
+    <div class="palette-manager-list" id="paletteManagerList"></div>
+    <div class="add-color-form">
+      <input id="newColorPicker" type="color" value="#8d79c7">
+      <input id="newColorName" type="text" placeholder="Nombre del color">
+      <button class="small-btn" id="addColorBtn">Añadir</button>
+    </div>
+    <div class="modal-actions">
+      <button class="small-btn" id="closePaletteModal">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwaEc8fbeqndv7qRWlNapUbcTwPZa7DsY76Uc2licXcVEgaMOHTVJkOlNOUkJV9vrew/exec";
+
+const DEFAULT_THEMES = [
+  { id: "lila", name: "Lila", primary: "#9a82d8", soft: "#e9e1ff", dark: "#6953a5", bg: "#f6f3fb" },
+  { id: "verde", name: "Verde", primary: "#72a987", soft: "#dff0e4", dark: "#4d7e60", bg: "#f2f8f3" },
+  { id: "rosa", name: "Rosa", primary: "#d48da8", soft: "#f6e0e8", dark: "#9b5872", bg: "#fbf4f7" },
+  { id: "azul", name: "Azul", primary: "#78a6c8", soft: "#dcecf7", dark: "#507b9d", bg: "#f1f7fb" }
+];
+
+const STORAGE_KEY = "agenda_digital_data_v1";
+
+let state = {
+  selectedDate: todayKey(),
+  view: "daily",
+  mode: "text",
+  selectedColor: "#8d79c7",
+  selectedBgColor: "#ffffff",
+  penWidth: 3,
+  palette: [
+    { name: "Lila", color: "#8d79c7" },
+    { name: "Azul", color: "#70a3c7" },
+    { name: "Verde", color: "#70aa86" },
+    { name: "Rosa", color: "#cf88a5" },
+    { name: "Melocotón", color: "#dca17e" }
+  ],
+  themeId: "lila",
+  themes: [],
+  days: {},
+  generalTasks: []
+};
+
+function todayKey() {
+  const d = new Date();
+  return formatDateKey(d);
+}
+
+function formatDateKey(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+function parseKey(key) {
+  const [y, m, d] = key.split("-").map(Number);
+  return new Date(y, m - 1, d);
+}
+
+function escapeHTML(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function shortDay(date) {
+  return date.toLocaleDateString("es-ES", { weekday: "short" }).replace(".", "");
+}
+
+function longDate(date) {
+  return date.toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" });
+}
+
+function getDayData(key) {
+  if (!state.days[key]) {
+    state.days[key] = {
+      text: "",
+      html: "",
+      textColor: state.selectedColor,
+      strokes: [],
+      tasks: []
+    };
+  }
+  return state.days[key];
+}
+
+/* LOCAL STORAGE */
+function saveLocal() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (err) {
+    console.warn("No se pudo guardar en localStorage", err);
+  }
+}
+
+function loadLocal() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const parsed = JSON.parse(raw);
+    state = {
+      ...state,
+      ...parsed,
+      palette: Array.isArray(parsed.palette) ? parsed.palette : state.palette,
+      themes: Array.isArray(parsed.themes) ? parsed.themes : [],
+      days: parsed.days || {},
+      generalTasks: Array.isArray(parsed.generalTasks) ? parsed.generalTasks : []
+    };
+  } catch (err) {
+    console.warn("Datos locales corruptos", err);
+  }
+}
+
+/* TEMAS */
+function getAllThemes() {
+  return [...DEFAULT_THEMES, ...(state.themes || [])];
+}
+
+function applyTheme() {
+  const theme = getAllThemes().find(t => t.id === state.themeId) || DEFAULT_THEMES[0];
+  document.documentElement.style.setProperty("--primary", theme.primary);
+  document.documentElement.style.setProperty("--primary-soft", theme.soft);
+  document.documentElement.style.setProperty("--primary-dark", theme.dark);
+  document.documentElement.style.setProperty("--bg", theme.bg);
+}
+
+/* RENDER GENERAL */
+function render() {
+  applyTheme();
+  renderPalette();
+  renderDaily();
+  renderWeek();
+  renderMonth();
+  renderGeneralTasks();
+  renderThemes();
+
+  document.querySelectorAll(".view-tab").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.view === state.view);
+  });
+
+  document.querySelectorAll(".view").forEach(view => {
+    view.classList.toggle("active", view.id === `${state.view}View`);
+  });
+
+  document.querySelectorAll(".mode-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.mode === state.mode);
+  });
+
+  document.getElementById("datePicker").value = state.selectedDate;
+  document.getElementById("textColorPicker").value = state.selectedColor;
+  document.getElementById("textBgPicker").value = state.selectedBgColor;
+  document.getElementById("penWidthSlider").value = state.penWidth;
+  document.getElementById("penWidthVal").textContent = `${state.penWidth}px`;
+
+  updateWorkspaceMode();
+}
+
+/* VISTA DIARIA */
+function renderDaily() {
+  const day = getDayData(state.selectedDate);
+
+  document.getElementById("dailyTitle").textContent = longDate(parseKey(state.selectedDate));
+  document.getElementById("todoDateLabel").textContent = formatHumanDate(state.selectedDate);
+
+  renderWeekStrip();
+  renderTodoList();
+
+  const editor = document.getElementById("notesEditor");
+
+  if (document.activeElement !== editor) {
+    if (day.html) {
+      editor.innerHTML = day.html;
+    } else {
+      editor.innerText = day.text || "";
+    }
+  }
+
+  requestAnimationFrame(() => {
+    resizeMainCanvas();
+    drawMainCanvas();
+  });
+}
+
+function formatHumanDate(key) {
+  return parseKey(key).toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
+}
+
+/* FORMATO DE TEXTO */
+function applyTextColor(color) {
+  state.selectedColor = color;
+  document.getElementById("textColorPicker").value = color;
+
+  if (state.mode === "text") {
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0 && !sel.isCollapsed) {
+      document.execCommand("foreColor", false, color);
+    } else {
+      document.execCommand("foreColor", false, color);
+    }
+    saveEditorContent();
+  }
+}
+
+function applyTextBgColor(color) {
+  state.selectedBgColor = color;
+  document.getElementById("textBgPicker").value = color;
+
+  if (state.mode === "text") {
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0 && !sel.isCollapsed) {
+      document.execCommand("hiliteColor", false, color);
+    } else {
+      document.execCommand("hiliteColor", false, color);
+    }
+    saveEditorContent();
+  }
+}
+
+function saveEditorContent() {
+  const day = getDayData(state.selectedDate);
+  const editor = document.getElementById("notesEditor");
+  day.html = editor.innerHTML;
+  day.text = editor.innerText;
+  saveLocal();
+  renderWeek();
+  renderMonth();
+  queueDriveSync();
+}
+
+/* SEMANA */
+function getStartOfWeek(date) {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function getWeekDates(baseKey) {
+  const start = getStartOfWeek(parseKey(baseKey));
+  const result = [];
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(start);
+    d.setDate(start.getDate() + i);
+    result.push(d);
+  }
+  return result;
+}
+
+function renderWeekStrip() {
+  const container = document.getElementById("weekStrip");
+  container.innerHTML = "";
+
+  getWeekDates(state.selectedDate).forEach(date => {
+    const key = formatDateKey(date);
+    const button = document.createElement("button");
+    button.className = "day-chip";
+    button.classList.toggle("active", key === state.selectedDate);
+
+    button.innerHTML = `<span>${escapeHTML(shortDay(date))}</span><strong>${date.getDate()}</strong>`;
+
+    button.addEventListener("click", () => {
+      state.selectedDate = key;
+      state.view = "daily";
+      saveLocal();
+      render();
+    });
+
+    container.appendChild(button);
+  });
+}
+
+/* TODO DIARIO */
+function renderTodoList() {
+  const container = document.getElementById("todoList");
+  const day = getDayData(state.selectedDate);
+  container.innerHTML = "";
+
+  if (!day.tasks.length) {
+    const empty = document.createElement("div");
+    empty.style.padding = "16px 7px";
+    empty.style.color = "var(--muted)";
+    empty.style.fontSize = "13px";
+    empty.textContent = "No hay tareas para este día.";
+    container.appendChild(empty);
+    return;
+  }
+
+  day.tasks.forEach((task, index) => {
+    const row = document.createElement("div");
+    row.className = "todo-item" + (task.done ? " done" : "");
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.className = "todo-check";
+    checkbox.checked = !!task.done;
+
+    checkbox.addEventListener("change", () => {
+      task.done = checkbox.checked;
+      saveLocal();
+      renderTodoList();
+      queueDriveSync();
+    });
+
+    const text = document.createElement("div");
+    text.className = "todo-text";
+    text.contentEditable = "true";
+    text.spellcheck = true;
+    text.textContent = task.text;
+
+    text.addEventListener("input", () => {
+      task.text = text.innerText;
+      saveLocal();
+      queueDriveSync();
+    });
+
+    const del = document.createElement("button");
+    del.className = "delete-task";
+    del.textContent = "×";
+    del.title = "Eliminar tarea";
+
+    del.addEventListener("click", () => {
+      day.tasks.splice(index, 1);
+      saveLocal();
+      renderTodoList();
+      queueDriveSync();
+    });
+
+    row.append(checkbox, text, del);
+    container.appendChild(row);
+  });
+}
+
+function addDailyTask() {
+  const input = document.getElementById("taskInput");
+  const value = input.value.trim();
+  if (!value) return;
+
+  getDayData(state.selectedDate).tasks.push({ text: value, done: false });
+  input.value = "";
+  saveLocal();
+  renderTodoList();
+  queueDriveSync();
+}
+
+/* TAREAS GENERALES */
+function renderGeneralTasks() {
+  const container = document.getElementById("generalTasks");
+  container.innerHTML = "";
+
+  state.generalTasks.forEach((task, index) => {
+    const row = document.createElement("div");
+    row.className = "general-task" + (task.done ? " done" : "");
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = !!task.done;
+    checkbox.className = "todo-check";
+
+    checkbox.addEventListener("change", () => {
+      task.done = checkbox.checked;
+      saveLocal();
+      renderGeneralTasks();
+      queueDriveSync();
+    });
+
+    const name = document.createElement("div");
+    name.className = "task-name";
+    name.contentEditable = "true";
+    name.textContent = task.text;
+
+    name.addEventListener("input", () => {
+      task.text = name.innerText;
+      saveLocal();
+      queueDriveSync();
+    });
+
+    const del = document.createElement("button");
+    del.className = "delete-task";
+    del.textContent = "×";
+
+    del.addEventListener("click", () => {
+      state.generalTasks.splice(index, 1);
+      saveLocal();
+      renderGeneralTasks();
+      queueDriveSync();
+    });
+
+    row.append(checkbox, name, del);
+    container.appendChild(row);
+  });
+}
+
+function addGeneralTask() {
+  const input = document.getElementById("generalTaskInput");
+  const value = input.value.trim();
+  if (!value) return;
+
+  state.generalTasks.push({ text: value, done: false });
+  input.value = "";
+  saveLocal();
+  renderGeneralTasks();
+  queueDriveSync();
+}
+
+/* PALETA DE COLORES */
+function renderPalette() {
+  const container = document.getElementById("palette");
+  container.innerHTML = "";
+
+  state.palette.forEach(item => {
+    const button = document.createElement("button");
+    button.className = "color-dot";
+    button.style.background = item.color;
+    button.title = item.name || item.color;
+    button.classList.toggle("active", item.color.toLowerCase() === state.selectedColor.toLowerCase());
+
+    button.addEventListener("click", () => {
+      applyTextColor(item.color);
+      renderPalette();
+      queueDriveSync();
+    });
+
+    container.appendChild(button);
+  });
+}
+
+function renderPaletteManager() {
+  const container = document.getElementById("paletteManagerList");
+  container.innerHTML = "";
+
+  state.palette.forEach((item, index) => {
+    const row = document.createElement("div");
+    row.className = "palette-manager-item";
+
+    const color = document.createElement("input");
+    color.type = "color";
+    color.value = item.color;
+
+    color.addEventListener("input", () => {
+      item.color = color.value;
+      saveLocal();
+      renderPalette();
+    });
+
+    const name = document.createElement("span");
+    name.textContent = item.name || item.color;
+
+    const del = document.createElement("button");
+    del.className = "delete-color";
+    del.textContent = "Eliminar";
+
+    del.addEventListener("click", () => {
+      if (state.palette.length <= 1) {
+        alert("Debe existir al menos un color.");
+        return;
+      }
+
+      const deleted = state.palette.splice(index, 1)[0];
+      if (deleted.color.toLowerCase() === state.selectedColor.toLowerCase()) {
+        state.selectedColor = state.palette[0].color;
+      }
+
+      saveLocal();
+      renderPalette();
+      renderPaletteManager();
+    });
+
+    row.append(color, name, del);
+    container.appendChild(row);
+  });
+}
+
+/* CANVAS Y DIBUJO */
+let drawing = false;
+let currentStroke = null;
+const mainCanvas = document.getElementById("notesCanvas");
+
+function resizeCanvas(canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = Math.max(1, window.devicePixelRatio || 1);
+  canvas.width = Math.round(rect.width * dpr);
+  canvas.height = Math.round(rect.height * dpr);
+
+  const ctx = canvas.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+  return { width: rect.width, height: rect.height };
+}
+
+function resizeMainCanvas() {
+  resizeCanvas(mainCanvas);
+}
+
+function getCanvasPoint(event, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width)),
+    y: Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height))
+  };
+}
+
+function drawStroke(ctx, stroke, width, height, scale = 1) {
+  if (!stroke.points.length) return;
+
+  ctx.save();
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = stroke.color;
+  ctx.lineWidth = (stroke.width || 3) * scale;
+
+  ctx.beginPath();
+  stroke.points.forEach((point, index) => {
+    const x = point.x * width;
+    const y = point.y * height;
+    if (index === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  });
+
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawStrokesOnCanvas(canvas, strokes) {
+  const size = resizeCanvas(canvas);
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, size.width, size.height);
+
+  strokes.forEach(stroke => {
+    drawStroke(ctx, stroke, size.width, size.height);
+  });
+}
+
+function drawMainCanvas() {
+  const day = getDayData(state.selectedDate);
+  drawStrokesOnCanvas(mainCanvas, day.strokes);
+}
+
+function startDrawing(event) {
+  if (state.mode === "text") return;
+  event.preventDefault();
+
+  const point = getCanvasPoint(event, mainCanvas);
+
+  if (state.mode === "eraser") {
+    eraseStrokeAt(point);
+    return;
+  }
+
+  drawing = true;
+  currentStroke = {
+    color: state.selectedColor,
+    width: state.penWidth,
+    points: [point]
+  };
+
+  const day = getDayData(state.selectedDate);
+  day.strokes.push(currentStroke);
+  drawMainCanvas();
+
+  try {
+    mainCanvas.setPointerCapture(event.pointerId);
+  } catch (_) {}
+}
+
+function continueDrawing(event) {
+  if (!drawing || !currentStroke) return;
+  event.preventDefault();
+
+  const point = getCanvasPoint(event, mainCanvas);
+  currentStroke.points.push(point);
+  drawMainCanvas();
+}
+
+function finishDrawing() {
+  if (!drawing) return;
+  drawing = false;
+  currentStroke = null;
+
+  saveLocal();
+  renderWeek();
+  renderMonth();
+  queueDriveSync();
+}
+
+/* GOMA DE BORRAR */
+function distancePointToSegment(p, a, b) {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y;
+  if (dx === 0 && dy === 0) {
+    return Math.hypot(p.x - a.x, p.y - a.y);
+  }
+  const t = Math.max(0, Math.min(1, ((p.x - a.x) * dx + (p.y - a.y) * dy) / (dx * dx + dy * dy)));
+  const x = a.x + t * dx;
+  const y = a.y + t * dy;
+  return Math.hypot(p.x - x, p.y - y);
+}
+
+function strokeDistance(point, stroke) {
+  let min = Infinity;
+  for (let i = 1; i < stroke.points.length; i++) {
+    min = Math.min(min, distancePointToSegment(point, stroke.points[i - 1], stroke.points[i]));
+  }
+  if (stroke.points.length === 1) {
+    min = Math.hypot(point.x - stroke.points[0].x, point.y - stroke.points[0].y);
+  }
+  return min;
+}
+
+function eraseStrokeAt(point) {
+  const day = getDayData(state.selectedDate);
+  if (!day.strokes.length) return;
+
+  const threshold = 0.035;
+
+  for (let i = day.strokes.length - 1; i >= 0; i--) {
+    if (strokeDistance(point, day.strokes[i]) < threshold) {
+      day.strokes.splice(i, 1);
+      saveLocal();
+      drawMainCanvas();
+      renderWeek();
+      renderMonth();
+      queueDriveSync();
+      break;
+    }
+  }
+}
+
+/* MODOS */
+function updateWorkspaceMode() {
+  const workspace = document.getElementById("notesWorkspace");
+  const strokeControl = document.getElementById("strokeControl");
+
+  workspace.classList.remove("text-mode", "pen-mode", "eraser-mode");
+  workspace.classList.add(`${state.mode}-mode`);
+
+  if (state.mode === "pen") {
+    strokeControl.style.display = "flex";
+  } else {
+    strokeControl.style.display = "none";
+  }
+}
+
+function setMode(mode) {
+  state.mode = mode;
+  updateWorkspaceMode();
+
+  if (mode === "text") {
+    document.getElementById("notesEditor").focus();
+  }
+}
+
+/* TEXTO EDITOR */
+const notesEditor = document.getElementById("notesEditor");
+
+notesEditor.addEventListener("input", () => {
+  saveEditorContent();
+});
+
+/* VISTA SEMANAL */
+function renderWeek() {
+  const grid = document.getElementById("weekGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  getWeekDates(state.selectedDate).forEach(date => {
+    const key = formatDateKey(date);
+    const day = getDayData(key);
+
+    const card = document.createElement("article");
+    card.className = "week-card";
+
+    const header = document.createElement("div");
+    header.className = "week-card-header";
+    header.innerHTML = `<strong>${escapeHTML(shortDay(date))} ${date.getDate()}</strong><span>${escapeHTML(date.toLocaleDateString("es-ES", { month: "long" }))}</span>`;
+
+    header.addEventListener("click", () => {
+      state.selectedDate = key;
+      state.view = "daily";
+      saveLocal();
+      render();
+    });
+
+    const note = document.createElement("div");
+    note.className = "mini-note";
+    note.contentEditable = "true";
+    note.spellcheck = true;
+    if (day.html) {
+      note.innerHTML = day.html;
+    } else {
+      note.textContent = day.text || "";
+    }
+
+    note.addEventListener("input", () => {
+      day.html = note.innerHTML;
+      day.text = note.innerText;
+      saveLocal();
+      renderMonth();
+      queueDriveSync();
+    });
+
+    const wrap = document.createElement("div");
+    wrap.className = "mini-canvas-wrap";
+
+    const canvas = document.createElement("canvas");
+    canvas.className = "mini-canvas";
+
+    wrap.appendChild(canvas);
+    card.append(header, note, wrap);
+    grid.appendChild(card);
+
+    requestAnimationFrame(() => {
+      drawStrokesOnCanvas(canvas, day.strokes);
+    });
+  });
+}
+
+/* VISTA MENSUAL */
+function renderMonth() {
+  const grid = document.getElementById("monthGrid");
+  if (!grid) return;
+  grid.innerHTML = "";
+
+  const selected = parseKey(state.selectedDate);
+  const year = selected.getFullYear();
+  const month = selected.getMonth();
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month + 1, 0);
+
+  const mondayOffset = first.getDay() === 0 ? 6 : first.getDay() - 1;
+  const totalCells = Math.ceil((mondayOffset + last.getDate()) / 7) * 7;
+
+  ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"].forEach(name => {
+    const h = document.createElement("div");
+    h.className = "month-heading";
+    h.textContent = name;
+    grid.appendChild(h);
+  });
+
+  for (let i = 0; i < totalCells; i++) {
+    const dayNumber = i - mondayOffset + 1;
+    const cell = document.createElement("div");
+    cell.className = "month-cell";
+
+    if (dayNumber < 1 || dayNumber > last.getDate()) {
+      cell.classList.add("empty");
+      grid.appendChild(cell);
+      continue;
+    }
+
+    const date = new Date(year, month, dayNumber);
+    const key = formatDateKey(date);
+    const day = getDayData(key);
+
+    if (key === todayKey()) {
+      cell.classList.add("today");
+    }
+
+    const number = document.createElement("div");
+    number.className = "month-date";
+    number.textContent = dayNumber;
+
+    const note = document.createElement("div");
+    note.className = "month-note";
+    note.contentEditable = "true";
+    note.spellcheck = true;
+    if (day.html) {
+      note.innerHTML = day.html;
+    } else {
+      note.textContent = day.text || "";
+    }
+
+    note.addEventListener("input", () => {
+      day.html = note.innerHTML;
+      day.text = note.innerText;
+      saveLocal();
+      renderWeek();
+      queueDriveSync();
+    });
+
+    const canvas = document.createElement("canvas");
+    canvas.className = "month-canvas";
+
+    cell.addEventListener("click", event => {
+      if (event.target === note || event.target === canvas) return;
+      state.selectedDate = key;
+      state.view = "daily";
+      saveLocal();
+      render();
+    });
+
+    cell.append(number, note, canvas);
+    grid.appendChild(cell);
+
+    requestAnimationFrame(() => {
+      drawStrokesOnCanvas(canvas, day.strokes);
+    });
+  }
+}
+
+/* TEMAS */
+function renderThemes() {
+  const container = document.getElementById("themeList");
+  container.innerHTML = "";
+
+  getAllThemes().forEach(theme => {
+    const button = document.createElement("button");
+    button.className = "theme-option";
+    button.classList.toggle("active", theme.id === state.themeId);
+
+    const swatch = document.createElement("div");
+    swatch.className = "theme-swatch";
+    swatch.style.background = `linear-gradient(90deg, ${theme.primary} 0 35%, ${theme.soft} 35% 100%)`;
+
+    const name = document.createElement("span");
+    name.textContent = theme.name;
+
+    button.append(swatch, name);
+
+    button.addEventListener("click", () => {
+      state.themeId = theme.id;
+      saveLocal();
+      applyTheme();
+      renderThemes();
+      queueDriveSync();
+    });
+
+    container.appendChild(button);
+  });
+}
+
+function addCustomTheme() {
+  const color = document.getElementById("customThemeColor").value;
+  const nameInput = document.getElementById("customThemeName");
+  const name = nameInput.value.trim() || "Tema personalizado";
+
+  const soft = mixColor(color, "#ffffff", .78);
+  const dark = mixColor(color, "#000000", .35);
+
+  const theme = {
+    id: "custom-" + Date.now(),
+    name,
+    primary: color,
+    soft,
+    dark,
+    bg: mixColor(color, "#ffffff", .90)
+  };
+
+  state.themes.push(theme);
+  state.themeId = theme.id;
+  nameInput.value = "";
+
+  saveLocal();
+  applyTheme();
+  renderThemes();
+  queueDriveSync();
+}
+
+function mixColor(a, b, amount) {
+  const aa = hexToRgb(a);
+  const bb = hexToRgb(b);
+  const r = Math.round(aa.r + (bb.r - aa.r) * amount);
+  const g = Math.round(aa.g + (bb.g - aa.g) * amount);
+  const bl = Math.round(aa.b + (bb.b - aa.b) * amount);
+  return rgbToHex(r, g, bl);
+}
+
+function hexToRgb(hex) {
+  const clean = hex.replace("#", "");
+  return {
+    r: parseInt(clean.substring(0, 2), 16),
+    g: parseInt(clean.substring(2, 4), 16),
+    b: parseInt(clean.substring(4, 6), 16)
+  };
+}
+
+function rgbToHex(r, g, b) {
+  return "#" + [r, g, b].map(v => v.toString(16).padStart(2, "0")).join("");
+}
+
+/* SINCRONIZACIÓN CON GOOGLE SHEETS */
+let driveSyncTimer = null;
+
+function setSyncStatus(text) {
+  document.getElementById("syncStatus").textContent = text;
+}
+
+async function saveToDrive() {
+  setSyncStatus("Guardando...");
+  try {
+    await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(state)
+    });
+    setSyncStatus("Sincronizado");
+  } catch (err) {
+    console.error(err);
+    setSyncStatus("Error al guardar");
+  }
+}
+
+async function loadFromDrive() {
+  setSyncStatus("Cargando...");
+  try {
+    const response = await fetch(APPS_SCRIPT_URL);
+    const remote = await response.json();
+
+    if (remote && typeof remote === "object" && Object.keys(remote).length > 0) {
+      state = {
+        ...state,
+        ...remote,
+        days: remote.days || {},
+        palette: remote.palette || state.palette,
+        themes: remote.themes || [],
+        generalTasks: remote.generalTasks || []
+      };
+      saveLocal();
+      render();
+    }
+    setSyncStatus("Sincronizado");
+  } catch (err) {
+    console.error(err);
+    setSyncStatus("Solo local");
+  }
+}
+
+function queueDriveSync() {
+  clearTimeout(driveSyncTimer);
+  driveSyncTimer = setTimeout(() => {
+    saveToDrive();
+  }, 1500);
+}
+
+/* EVENTOS DE INTERFAZ Y NAVEGACIÓN */
+document.getElementById("datePicker").addEventListener("change", event => {
+  if (!event.target.value) return;
+  state.selectedDate = event.target.value;
+  saveLocal();
+  render();
+});
+
+document.querySelectorAll(".view-tab").forEach(button => {
+  button.addEventListener("click", () => {
+    state.view = button.dataset.view;
+    saveLocal();
+    render();
+  });
+});
+
+document.getElementById("todayBtn").addEventListener("click", () => {
+  state.selectedDate = todayKey();
+  state.view = "daily";
+  saveLocal();
+  render();
+});
+
+document.querySelectorAll(".mode-btn").forEach(button => {
+  button.addEventListener("click", () => {
+    setMode(button.dataset.mode);
+    render();
+  });
+});
+
+/* EVENTOS DE SELECCIÓN Y COLORES DE TEXTO / LÁPIZ */
+document.getElementById("textColorPicker").addEventListener("input", event => {
+  applyTextColor(event.target.value);
+});
+
+document.getElementById("textBgPicker").addEventListener("input", event => {
+  applyTextBgColor(event.target.value);
+});
+
+document.getElementById("penWidthSlider").addEventListener("input", event => {
+  state.penWidth = parseInt(event.target.value, 10);
+  document.getElementById("penWidthVal").textContent = `${state.penWidth}px`;
+  saveLocal();
+});
+
+/* CANVAS EVENTS */
+mainCanvas.addEventListener("pointerdown", startDrawing);
+mainCanvas.addEventListener("pointermove", continueDrawing);
+mainCanvas.addEventListener("pointerup", finishDrawing);
+mainCanvas.addEventListener("pointercancel", finishDrawing);
+
+/* TAREAS EVENTS */
+document.getElementById("addTaskBtn").addEventListener("click", addDailyTask);
+document.getElementById("taskInput").addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    addDailyTask();
+  }
+});
+
+document.getElementById("addGeneralTaskBtn").addEventListener("click", addGeneralTask);
+document.getElementById("generalTaskInput").addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    addGeneralTask();
+  }
+});
+
+/* SIDEBAR & MODAL EVENTS */
+const sidebar = document.getElementById("sidebar");
+const sidebarOverlay = document.getElementById("sidebarOverlay");
+
+function openSidebar() {
+  sidebar.classList.add("open");
+  sidebarOverlay.classList.add("open");
+}
+
+function closeSidebar() {
+  sidebar.classList.remove("open");
+  sidebarOverlay.classList.remove("open");
+}
+
+document.getElementById("menuBtn").addEventListener("click", openSidebar);
+document.getElementById("closeSidebar").addEventListener("click", closeSidebar);
+sidebarOverlay.addEventListener("click", closeSidebar);
+
+document.getElementById("managePalette").addEventListener("click", () => {
+  renderPaletteManager();
+  document.getElementById("paletteModal").classList.add("open");
+});
+
+document.getElementById("closePaletteModal").addEventListener("click", () => {
+  document.getElementById("paletteModal").classList.remove("open");
+});
+
+document.getElementById("addColorBtn").addEventListener("click", () => {
+  const picker = document.getElementById("newColorPicker");
+  const name = document.getElementById("newColorName");
+
+  state.palette.push({
+    name: name.value.trim() || picker.value,
+    color: picker.value
+  });
+
+  name.value = "";
+  saveLocal();
+  renderPalette();
+  renderPaletteManager();
+  queueDriveSync();
+});
+
+document.getElementById("addThemeBtn").addEventListener("click", addCustomTheme);
+
+document.getElementById("googleSync").addEventListener("click", async () => {
+  await saveToDrive();
+});
+
+let resizeTimer;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    resizeMainCanvas();
+    drawMainCanvas();
+    if (state.view === "weekly") renderWeek();
+    if (state.view === "monthly") renderMonth();
+  }, 80);
+});
+
+/* INICIALIZACIÓN */
+loadLocal();
+
+if (!state.selectedDate) state.selectedDate = todayKey();
+if (!state.themeId) state.themeId = "lila";
+if (!state.mode) state.mode = "text";
+if (!state.penWidth) state.penWidth = 3;
+
+applyTheme();
+render();
+
+// Cargar la copia guardada desde Google Sheets al abrir la app
+loadFromDrive();
+</script>
+
+</body>
+</html>
